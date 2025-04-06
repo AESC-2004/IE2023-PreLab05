@@ -48,11 +48,55 @@ void adc_disable() {
 }
 
 void adc_channel(adc_channel_t channel) {
-	// MUX bits (MUX[4:0] in ADMUX, MUX5 in ADCSRB)
-	uint8_t mux5		 = (channel >> 5) & 0x01;
-	uint8_t mux0_to_mux4 = channel & 0x1F;
-	ADMUX		= (ADMUX & 0b11100000) | mux0_to_mux4;         // Preserve REFS and ADLAR, update MUX[4:0]
-	ADCSRB		= (ADCSRB & ~(1 << MUX5)) | (mux5 << MUX5);
+	switch (channel) {
+		case ADC_CHANNEL_ADC0:                      ADMUX = (ADMUX & 0xE0) | 0x00; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_ADC1:                      ADMUX = (ADMUX & 0xE0) | 0x01; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_ADC4:                      ADMUX = (ADMUX & 0xE0) | 0x04; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_ADC5:                      ADMUX = (ADMUX & 0xE0) | 0x05; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_ADC6:                      ADMUX = (ADMUX & 0xE0) | 0x06; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_ADC7:                      ADMUX = (ADMUX & 0xE0) | 0x07; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC1_ADC0_10x:        ADMUX = (ADMUX & 0xE0) | 0x09; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC1_ADC0_200x:       ADMUX = (ADMUX & 0xE0) | 0x0B; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC0_ADC1_1x:         ADMUX = (ADMUX & 0xE0) | 0x10; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC4_ADC1_1x:         ADMUX = (ADMUX & 0xE0) | 0x14; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC5_ADC1_1x:         ADMUX = (ADMUX & 0xE0) | 0x15; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC6_ADC1_1x:         ADMUX = (ADMUX & 0xE0) | 0x16; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC7_ADC1_1x:         ADMUX = (ADMUX & 0xE0) | 0x17; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_1V1:                       ADMUX = (ADMUX & 0xE0) | 0x1E; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_GND:                       ADMUX = (ADMUX & 0xE0) | 0x1F; ADCSRB &= ~(1 << MUX5); break;
+		case ADC_CHANNEL_ADC8:                      ADMUX = (ADMUX & 0xE0) | 0x00; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_ADC9:                      ADMUX = (ADMUX & 0xE0) | 0x01; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_ADC10:                     ADMUX = (ADMUX & 0xE0) | 0x02; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_ADC11:                     ADMUX = (ADMUX & 0xE0) | 0x03; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_ADC12:                     ADMUX = (ADMUX & 0xE0) | 0x04; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_ADC13:                     ADMUX = (ADMUX & 0xE0) | 0x05; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_TEMPERATURE:               ADMUX = (ADMUX & 0xE0) | 0x07; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC4_ADC0_10x:        ADMUX = (ADMUX & 0xE0) | 0x18; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC5_ADC0_10x:        ADMUX = (ADMUX & 0xE0) | 0x19; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC6_ADC0_10x:        ADMUX = (ADMUX & 0xE0) | 0x1A; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC7_ADC0_10x:        ADMUX = (ADMUX & 0xE0) | 0x1B; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC4_ADC1_10x:        ADMUX = (ADMUX & 0xE0) | 0x1C; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC5_ADC1_10x:        ADMUX = (ADMUX & 0xE0) | 0x1D; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC6_ADC1_10x:        ADMUX = (ADMUX & 0xE0) | 0x1E; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC7_ADC1_10x:        ADMUX = (ADMUX & 0xE0) | 0x1F; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC4_ADC0_40x:        ADMUX = (ADMUX & 0xE0) | 0x20; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC5_ADC0_40x:        ADMUX = (ADMUX & 0xE0) | 0x21; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC6_ADC0_40x:        ADMUX = (ADMUX & 0xE0) | 0x22; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC7_ADC0_40x:        ADMUX = (ADMUX & 0xE0) | 0x23; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC4_ADC1_40x:        ADMUX = (ADMUX & 0xE0) | 0x24; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC5_ADC1_40x:        ADMUX = (ADMUX & 0xE0) | 0x25; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC6_ADC1_40x:        ADMUX = (ADMUX & 0xE0) | 0x26; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC7_ADC1_40x:        ADMUX = (ADMUX & 0xE0) | 0x27; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC4_ADC0_200x:       ADMUX = (ADMUX & 0xE0) | 0x28; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC5_ADC0_200x:       ADMUX = (ADMUX & 0xE0) | 0x29; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC6_ADC0_200x:       ADMUX = (ADMUX & 0xE0) | 0x2A; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC7_ADC0_200x:       ADMUX = (ADMUX & 0xE0) | 0x2B; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC4_ADC1_200x:       ADMUX = (ADMUX & 0xE0) | 0x2C; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC5_ADC1_200x:       ADMUX = (ADMUX & 0xE0) | 0x2D; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC6_ADC1_200x:       ADMUX = (ADMUX & 0xE0) | 0x2E; ADCSRB |=  (1 << MUX5); break;
+		case ADC_CHANNEL_DIFF_ADC7_ADC1_200x:       ADMUX = (ADMUX & 0xE0) | 0x2F; ADCSRB |=  (1 << MUX5); break;
+		default: break;
+	}
 }
 
 void adc_ref(adc_ref_t reference) {
