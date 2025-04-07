@@ -5,7 +5,9 @@
  *  Author: ang50
  */ 
 
-#include "_32u4tims16b.h"
+#include <avr/io.h>
+#include <stdint.h>
+#include "32u4tims16b.h"
 
 void tim_16b_init(tim_16b_num_t TIM_number,
 tim_16b_channel_t TIM_channel,
