@@ -1,0 +1,311 @@
+/*
+ * _32u4tims16b.c
+ *
+ * Created: 06/04/2025 06:16:23 p. m.
+ *  Author: ang50
+ */ 
+
+#include "_32u4tims16b.h"
+
+void tim_16b_init(tim_16b_num_t TIM_number,
+tim_16b_channel_t TIM_channel,
+tim_16b_prescaler_t TIM_prescaler,
+tim_16b_mode_t TIM_waveform_mode,
+uint16_t TIM_TOP_value,
+tim_16b_com_t TIM_COM_mode,
+uint16_t TIM_TCNT_inital_value,
+tim_16b_ocnx_t TIM_OCnx_DDRn_ENABLING)
+{
+	tim_16b_reset(TIM_number);
+	tim_16b_waveform_mode(TIM_number, TIM_waveform_mode);
+	tim_16b_compare_output_mode(TIM_number, TIM_channel, TIM_COM_mode);
+	if (TIM_OCnx_DDRn_ENABLING == TIM_16b_OCnx_ENABLE)
+	tim_16b_ocnx_enable(TIM_number, TIM_channel);
+	tim_16b_top_value(TIM_number, TIM_TOP_value);
+	tim_16b_tcnt_value(TIM_number, TIM_TCNT_inital_value);
+	tim_16b_prescaler(TIM_prescaler);
+}
+
+void tim_16b_tcnt_value(tim_16b_num_t TIM_number, uint16_t TIM_TCNT_value)
+{
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1: TCNT1 = TIM_TCNT_value; break;
+		case TIM_16b_NUM_3: TCNT3 = TIM_TCNT_value; break;
+	}
+}
+
+void tim_16b_ocr_value(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, uint16_t TIM_OCR_value)
+{
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A: OCR1A = TIM_OCR_value; break;
+			case TIM_16b_CHANNEL_B: OCR1B = TIM_OCR_value; break;
+			case TIM_16b_CHANNEL_C: OCR1C = TIM_OCR_value; break;
+		}
+		break;
+		case TIM_16b_NUM_3:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A: OCR3A = TIM_OCR_value; break;
+			case TIM_16b_CHANNEL_B: OCR3B = TIM_OCR_value; break;
+			case TIM_16b_CHANNEL_C: OCR3C = TIM_OCR_value; break;
+		}
+		break;
+	}
+}
+
+void tim_16b_compare_output_mode(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, tim_16b_com_t TIM_COM_mode)
+{
+	uint8_t com_bits = 0;
+	switch (TIM_COM_mode)
+	{
+		case TIM_16b_COM_OCnx_DISCONNECTED: com_bits = 0b00; break;
+		case TIM_16b_COM_TOGGLE_OCnx:        com_bits = 0b01; break;
+		case TIM_16b_COM_NON_INVERT_OCnx:    com_bits = 0b10; break;
+		case TIM_16b_COM_INVERT_OCnx:        com_bits = 0b11; break;
+	}
+
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A:
+			TCCR1A = (TCCR1A & ~((1 << COM1A1) | (1 << COM1A0))) | (com_bits << COM1A0);
+			break;
+			case TIM_16b_CHANNEL_B:
+			TCCR1A = (TCCR1A & ~((1 << COM1B1) | (1 << COM1B0))) | (com_bits << COM1B0);
+			break;
+			case TIM_16b_CHANNEL_C:
+			TCCR1A = (TCCR1A & ~((1 << COM1C1) | (1 << COM1C0))) | (com_bits << COM1C0);
+			break;
+		}
+		break;
+		case TIM_16b_NUM_3:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A:
+			TCCR3A = (TCCR3A & ~((1 << COM3A1) | (1 << COM3A0))) | (com_bits << COM3A0);
+			break;
+			case TIM_16b_CHANNEL_B:
+			TCCR3A = (TCCR3A & ~((1 << COM3B1) | (1 << COM3B0))) | (com_bits << COM3B0);
+			break;
+			case TIM_16b_CHANNEL_C:
+			TCCR3A = (TCCR3A & ~((1 << COM3C1) | (1 << COM3C0))) | (com_bits << COM3C0);
+			break;
+		}
+		break;
+	}
+}
+
+void tim_16b_prescaler(tim_16b_prescaler_t TIM_prescaler)
+{
+	TCCR1B = (TCCR1B & 0xF8) | (TIM_prescaler & 0x07);
+	TCCR3B = (TCCR3B & 0xF8) | (TIM_prescaler & 0x07);
+}
+
+void tim_16b_waveform_mode(tim_16b_num_t TIM_number, tim_16b_mode_t TIM_waveform_mode)
+{
+	uint8_t wgm_low = TIM_waveform_mode & 0x03;
+	uint8_t wgm_high = (TIM_waveform_mode >> 2) & 0x03;
+
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1:
+		TCCR1A = (TCCR1A & ~((1 << WGM11) | (1 << WGM10))) | (wgm_low << WGM10);
+		TCCR1B = (TCCR1B & ~((1 << WGM13) | (1 << WGM12))) | (wgm_high << WGM12);
+		break;
+		case TIM_16b_NUM_3:
+		TCCR3A = (TCCR3A & ~((1 << WGM11) | (1 << WGM10))) | (wgm_low << WGM10);
+		TCCR3B = (TCCR3B & ~((1 << WGM13) | (1 << WGM12))) | (wgm_high << WGM12);
+		break;
+	}
+}
+
+void tim_16b_top_value(tim_16b_num_t TIM_number, uint16_t TIM_TOP_value)
+{
+	uint8_t wgm_bits;
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1:
+		wgm_bits = ((TCCR1B & ((1 << WGM13) | (1 << WGM12))) >> WGM12) << 2;
+		wgm_bits |= (TCCR1A & ((1 << WGM11) | (1 << WGM10))) >> WGM10;
+		if (wgm_bits == 14 || wgm_bits == 10 || wgm_bits == 12) ICR1 = TIM_TOP_value;
+		else if (wgm_bits == 15 || wgm_bits == 11 || wgm_bits == 13) OCR1A = TIM_TOP_value;
+		break;
+		case TIM_16b_NUM_3:
+		wgm_bits = ((TCCR3B & ((1 << WGM13) | (1 << WGM12))) >> WGM12) << 2;
+		wgm_bits |= (TCCR3A & ((1 << WGM11) | (1 << WGM10))) >> WGM10;
+		if (wgm_bits == 14 || wgm_bits == 10 || wgm_bits == 12) ICR3 = TIM_TOP_value;
+		else if (wgm_bits == 15 || wgm_bits == 11 || wgm_bits == 13) OCR3A = TIM_TOP_value;
+		break;
+	}
+}
+
+void tim_16b_ocnx_enable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel)
+{
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A: DDRB |= (1 << PB5); break;
+			case TIM_16b_CHANNEL_B: DDRB |= (1 << PB6); break;
+			case TIM_16b_CHANNEL_C: DDRB |= (1 << PB7); break;
+		}
+		break;
+		case TIM_16b_NUM_3:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A: DDRE |= (1 << PE3); break;
+			case TIM_16b_CHANNEL_B: DDRE |= (1 << PE4); break;
+			case TIM_16b_CHANNEL_C: DDRE |= (1 << PE5); break;
+		}
+		break;
+	}
+}
+
+void tim_16b_ocnx_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel)
+{
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A: DDRB &= ~(1 << PB5); break;
+			case TIM_16b_CHANNEL_B: DDRB &= ~(1 << PB6); break;
+			case TIM_16b_CHANNEL_C: DDRB &= ~(1 << PB7); break;
+		}
+		break;
+		case TIM_16b_NUM_3:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A: DDRE &= ~(1 << PE3); break;
+			case TIM_16b_CHANNEL_B: DDRE &= ~(1 << PE4); break;
+			case TIM_16b_CHANNEL_C: DDRE &= ~(1 << PE5); break;
+		}
+		break;
+	}
+}
+
+void tim_16b_ovf_interrupt_enable(tim_16b_num_t TIM_number) {
+	switch (TIM_number) {
+		case TIM_16b_NUM_1: TIMSK1 |= (1 << TOIE1); break;
+		case TIM_16b_NUM_3: TIMSK3 |= (1 << TOIE3); break;
+	}
+}
+
+void tim_16b_ic_interrupt_enable(tim_16b_num_t TIM_number) {
+	switch (TIM_number) {
+		case TIM_16b_NUM_1: TIMSK1 |= (1 << ICIE1); break;
+		case TIM_16b_NUM_3: TIMSK3 |= (1 << ICIE3); break;
+	}
+}
+
+void tim_16b_oc_interrupt_enable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel) {
+	switch (TIM_number) {
+		case TIM_16b_NUM_1:
+		switch (TIM_channel) {
+			case TIM_16b_CHANNEL_A: TIMSK1 |= (1 << OCIE1A); break;
+			case TIM_16b_CHANNEL_B: TIMSK1 |= (1 << OCIE1B); break;
+			case TIM_16b_CHANNEL_C: TIMSK1 |= (1 << OCIE1C); break;
+		}
+		break;
+		case TIM_16b_NUM_3:
+		switch (TIM_channel) {
+			case TIM_16b_CHANNEL_A: TIMSK3 |= (1 << OCIE3A); break;
+			case TIM_16b_CHANNEL_B: TIMSK3 |= (1 << OCIE3B); break;
+			case TIM_16b_CHANNEL_C: TIMSK3 |= (1 << OCIE3C); break;
+		}
+		break;
+	}
+}
+
+void tim_16b_ovf_interrupt_disable(tim_16b_num_t TIM_number) {
+	switch (TIM_number) {
+		case TIM_16b_NUM_1: TIMSK1 &= ~(1 << TOIE1); break;
+		case TIM_16b_NUM_3: TIMSK3 &= ~(1 << TOIE3); break;
+	}
+}
+
+void tim_16b_ic_interrupt_disable(tim_16b_num_t TIM_number) {
+	switch (TIM_number) {
+		case TIM_16b_NUM_1: TIMSK1 &= ~(1 << ICIE1); break;
+		case TIM_16b_NUM_3: TIMSK3 &= ~(1 << ICIE3); break;
+	}
+}
+
+void tim_16b_oc_interrupt_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel) {
+	switch (TIM_number) {
+		case TIM_16b_NUM_1:
+		switch (TIM_channel) {
+			case TIM_16b_CHANNEL_A: TIMSK1 &= ~(1 << OCIE1A); break;
+			case TIM_16b_CHANNEL_B: TIMSK1 &= ~(1 << OCIE1B); break;
+			case TIM_16b_CHANNEL_C: TIMSK1 &= ~(1 << OCIE1C); break;
+		}
+		break;
+		case TIM_16b_NUM_3:
+		switch (TIM_channel) {
+			case TIM_16b_CHANNEL_A: TIMSK3 &= ~(1 << OCIE3A); break;
+			case TIM_16b_CHANNEL_B: TIMSK3 &= ~(1 << OCIE3B); break;
+			case TIM_16b_CHANNEL_C: TIMSK3 &= ~(1 << OCIE3C); break;
+		}
+		break;
+	}
+}
+
+void tim_16b_reset(tim_16b_num_t TIM_number)
+{
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1:
+		TCCR1A = 0;
+		TCCR1B = 0;
+		TCCR1C = 0;
+		TCNT1 = 0;
+		OCR1A = 0;
+		OCR1B = 0;
+		OCR1C = 0;
+		ICR1 = 0;
+		TIMSK1 = 0;
+		break;
+		case TIM_16b_NUM_3:
+		TCCR3A = 0;
+		TCCR3B = 0;
+		TCCR3C = 0;
+		TCNT3 = 0;
+		OCR3A = 0;
+		OCR3B = 0;
+		OCR3C = 0;
+		ICR3 = 0;
+		TIMSK3 = 0;
+		break;
+	}
+}
+
+void tim_16b_force_output_compare(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel)
+{
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A: TCCR1C |= (1 << FOC1A); break;
+			case TIM_16b_CHANNEL_B: TCCR1C |= (1 << FOC1B); break;
+			case TIM_16b_CHANNEL_C: TCCR1C |= (1 << FOC1C); break;
+		}
+		break;
+		case TIM_16b_NUM_3:
+		switch (TIM_channel)
+		{
+			case TIM_16b_CHANNEL_A: TCCR3C |= (1 << FOC3A); break;
+			case TIM_16b_CHANNEL_B: TCCR3C |= (1 << FOC3B); break;
+			case TIM_16b_CHANNEL_C: TCCR3C |= (1 << FOC3C); break;
+		}
+		break;
+	}
+}
