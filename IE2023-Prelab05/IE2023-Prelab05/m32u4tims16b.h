@@ -109,7 +109,7 @@ void	tim_16b_ic_interrupt_disable(tim_16b_num_t TIM_number);									// Input ca
 void	tim_16b_oc_interrupt_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel);	// Output compare
 
 // Prescaler selection			(Without changing other settings)
-void	tim_16b_prescaler(tim_16b_prescaler_t TIM_prescaler);
+void	tim_16b_prescaler(tim_16b_num_t TIM_number, tim_16b_prescaler_t TIM_prescaler);
 
 // Waveform mode				(Without changing other settings)
 void	tim_16b_waveform_mode(tim_16b_num_t TIM_number, tim_16b_mode_t TIM_waveform_mode);

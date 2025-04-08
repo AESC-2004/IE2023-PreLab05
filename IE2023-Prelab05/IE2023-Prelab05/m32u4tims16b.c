@@ -26,7 +26,7 @@ uint16_t TIM_TCNT_inital_value,
 tim_16b_ocnx_t TIM_OCnx_DDRn_ENABLING)
 {
 	tim_16b_reset(TIM_number);
-	tim_16b_prescaler(TIM_prescaler);
+	tim_16b_prescaler(TIM_number, TIM_prescaler);
 	tim_16b_waveform_mode(TIM_number, TIM_waveform_mode);
 	tim_16b_compare_output_mode(TIM_number, TIM_channel, TIM_COM_mode);
 	if (TIM_OCnx_DDRn_ENABLING == TIM_16b_OCnx_ENABLE)
@@ -140,9 +140,15 @@ void tim_16b_oc_interrupt_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TI
 	}
 }
 
-void tim_16b_prescaler(tim_16b_prescaler_t TIM_prescaler)
+void tim_16b_prescaler(tim_16b_num_t TIM_number, tim_16b_prescaler_t TIM_prescaler)
 {
-	TCCR1B = (TCCR1B & 0xF8) | (TIM_prescaler);
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1: TCCR1B = (TCCR1B & 0xF8) | (TIM_prescaler); break;
+		case TIM_16b_NUM_3: TCCR3B = (TCCR3B & 0xF8) | (TIM_prescaler); break;
+		default: break;
+	}
+	
 }
 
 void tim_16b_waveform_mode(tim_16b_num_t TIM_number, tim_16b_mode_t TIM_waveform_mode)
