@@ -6,9 +6,8 @@
  */ 
 
 
-#ifndef U32U4TIMS16B_H_
-#define U32U4TIMS16B_H_
-
+#ifndef M32U4TIMS16B_H_
+#define M32U4TIMS16B_H_
 
 /*********************************************************************************************************************************************/
 // External libraries
@@ -34,21 +33,21 @@ typedef enum {
 
 // TIM_16b_MODE enumeration
 typedef enum {
-	TIM_16b_MODE_NORMAL									= (0 << WGM13) | (0 << WGM12) | (0 << WGM11) | (0 << WGM10),
-	TIM_16b_MODE_PHASE_CORRECT_PWM_8b					= (0 << WGM13) | (0 << WGM12) | (0 << WGM11) | (1 << WGM10),
-	TIM_16b_MODE_PHASE_CORRECT_PWM_9b					= (0 << WGM13) | (0 << WGM12) | (1 << WGM11) | (0 << WGM10),
-	TIM_16b_MODE_PHASE_CORRECT_PWM_10b					= (0 << WGM13) | (0 << WGM12) | (1 << WGM11) | (1 << WGM10),
-	TIM_16b_MODE_CTC_OCRnA								= (0 << WGM13) | (1 << WGM12) | (0 << WGM11) | (0 << WGM10),
-	TIM_16b_MODE_FAST_PWM_8b							= (0 << WGM13) | (1 << WGM12) | (0 << WGM11) | (1 << WGM10),
-	TIM_16b_MODE_FAST_PWM_9b							= (0 << WGM13) | (1 << WGM12) | (1 << WGM11) | (0 << WGM10),
-	TIM_16b_MODE_FAST_PWM_10b							= (0 << WGM13) | (1 << WGM12) | (1 << WGM11) | (1 << WGM10),
-	TIM_16b_MODE_PHASE_AND_FREQ_CORRECT_PWM_ICRn		= (1 << WGM13) | (0 << WGM12) | (0 << WGM11) | (0 << WGM10),
-	TIM_16b_MODE_PHASE_AND_FREQ_CORRECT_PWM_OCRnA		= (1 << WGM13) | (0 << WGM12) | (0 << WGM11) | (1 << WGM10),
-	TIM_16b_MODE_PHASE_CORRECT_PWM_ICRn					= (1 << WGM13) | (0 << WGM12) | (1 << WGM11) | (0 << WGM10),
-	TIM_16b_MODE_PHASE_CORRECT_PWM_OCRnA				= (1 << WGM13) | (0 << WGM12) | (1 << WGM11) | (1 << WGM10),
-	TIM_16b_MODE_CTC_ICRn								= (1 << WGM13) | (1 << WGM12) | (0 << WGM11) | (0 << WGM10),
-	TIM_16b_MODE_FAST_PWM_ICRn							= (1 << WGM13) | (1 << WGM12) | (1 << WGM11) | (0 << WGM10),
-	TIM_16b_MODE_FAST_PWM_OCRnA							= (1 << WGM13) | (1 << WGM12) | (1 << WGM11) | (1 << WGM10)
+	TIM_16b_MODE_NORMAL,
+	TIM_16b_MODE_PHASE_CORRECT_PWM_8b,
+	TIM_16b_MODE_PHASE_CORRECT_PWM_9b,
+	TIM_16b_MODE_PHASE_CORRECT_PWM_10b,
+	TIM_16b_MODE_CTC_OCRnA,
+	TIM_16b_MODE_FAST_PWM_8b,
+	TIM_16b_MODE_FAST_PWM_9b,
+	TIM_16b_MODE_FAST_PWM_10b,
+	TIM_16b_MODE_PHASE_AND_FREQ_CORRECT_PWM_ICRn,
+	TIM_16b_MODE_PHASE_AND_FREQ_CORRECT_PWM_OCRnA,
+	TIM_16b_MODE_PHASE_CORRECT_PWM_ICRn,
+	TIM_16b_MODE_PHASE_CORRECT_PWM_OCRnA,
+	TIM_16b_MODE_CTC_ICRn,
+	TIM_16b_MODE_FAST_PWM_ICRn,
+	TIM_16b_MODE_FAST_PWM_OCRnA
 } tim_16b_mode_t;
 
 // TIM_16b_PRESCALER enumeration
@@ -66,7 +65,7 @@ typedef enum {
 // TIM_16b_COM enumeration
 typedef enum {
 	TIM_16b_COM_OCnx_DISCONNECTED,
-	TIM_16b_COM_TOGGLE_OCnx,									
+	TIM_16b_COM_TOGGLE_OCnx,
 	TIM_16b_COM_NON_INVERT_OCnx,
 	TIM_16b_COM_INVERT_OCnx
 } tim_16b_com_t;
@@ -88,7 +87,6 @@ tim_16b_channel_t TIM_channel,
 tim_16b_prescaler_t TIM_prescaler,
 tim_16b_mode_t TIM_waveform_mode,
 uint16_t TIM_TOP_value,
-uint16_t TIM_OCR_value,
 tim_16b_com_t TIM_COM_mode,
 uint16_t TIM_TCNT_inital_value,
 tim_16b_ocnx_t TIM_OCnx_DDRn_ENABLING
@@ -110,9 +108,6 @@ void	tim_16b_ovf_interrupt_disable(tim_16b_num_t TIM_number);								// Overflow
 void	tim_16b_ic_interrupt_disable(tim_16b_num_t TIM_number);									// Input capture
 void	tim_16b_oc_interrupt_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel);	// Output compare
 
-// Force output compare			(Without changing other settings)
-void	tim_16b_force_output_compare(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel);
-
 // Prescaler selection			(Without changing other settings)
 void	tim_16b_prescaler(tim_16b_prescaler_t TIM_prescaler);
 
@@ -122,11 +117,6 @@ void	tim_16b_waveform_mode(tim_16b_num_t TIM_number, tim_16b_mode_t TIM_waveform
 // COM Mode						(Without changing other settings)
 void	tim_16b_compare_output_mode(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, tim_16b_com_t TIM_COM_mode);
 
-// TOP Value					(Without changing other settings)
-// This function shall look for the WGM bits to see which register to change depending on the waveform mode established!
-// If no register controls the TOP value, no action should be done!
-void	tim_16b_top_value(tim_16b_num_t TIM_number, uint16_t TIM_TOP_value);
-
 // OCnx enabling				(Without changing other settings)
 void	tim_16b_ocnx_enable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel);
 
@@ -135,6 +125,10 @@ void	tim_16b_ocnx_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channe
 
 // TIM reseting					(Without changing other settings)
 void tim_16b_reset(tim_16b_num_t TIM_number);
-/*********************************************************************************************************************************************/
 
-#endif /* U32U4TIMS16B_H_ */
+// TOP Value					(Without changing other settings)
+// This function shall look for the WGM bits to see which register to change depending on the waveform mode established!
+// If no register controls the TOP value, no action should be done!
+void	tim_16b_top_value(tim_16b_num_t TIM_number, uint16_t TIM_TOP_value);
+
+#endif /* M32U4TIMS16B_H_ */
