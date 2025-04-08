@@ -88,6 +88,7 @@ tim_16b_channel_t TIM_channel,
 tim_16b_prescaler_t TIM_prescaler,
 tim_16b_mode_t TIM_waveform_mode,
 uint16_t TIM_TOP_value,
+uint16_t TIM_OCR_value,
 tim_16b_com_t TIM_COM_mode,
 uint16_t TIM_TCNT_inital_value,
 tim_16b_ocnx_t TIM_OCnx_DDRn_ENABLING

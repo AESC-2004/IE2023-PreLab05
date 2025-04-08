@@ -14,18 +14,26 @@ tim_16b_channel_t TIM_channel,
 tim_16b_prescaler_t TIM_prescaler,
 tim_16b_mode_t TIM_waveform_mode,
 uint16_t TIM_TOP_value,
+uint16_t TIM_OCR_value,
 tim_16b_com_t TIM_COM_mode,
 uint16_t TIM_TCNT_inital_value,
 tim_16b_ocnx_t TIM_OCnx_DDRn_ENABLING)
 {
+	tim_16b_prescaler(TIM_prescaler);
 	tim_16b_reset(TIM_number);
 	tim_16b_waveform_mode(TIM_number, TIM_waveform_mode);
 	tim_16b_compare_output_mode(TIM_number, TIM_channel, TIM_COM_mode);
-	if (TIM_OCnx_DDRn_ENABLING == TIM_16b_OCnx_ENABLE) tim_16b_ocnx_enable(TIM_number, TIM_channel);
-	else if (TIM_OCnx_DDRn_ENABLING == TIM_16b_OCnx_DISABLE) tim_16b_ocnx_disable(TIM_number, TIM_channel);
+	if (TIM_OCnx_DDRn_ENABLING == TIM_16b_OCnx_ENABLE) 
+	{
+		tim_16b_ocnx_enable(TIM_number, TIM_channel);
+	}
+	else if (TIM_OCnx_DDRn_ENABLING == TIM_16b_OCnx_DISABLE) 
+	{
+		tim_16b_ocnx_disable(TIM_number, TIM_channel);
+	}
 	tim_16b_top_value(TIM_number, TIM_TOP_value);
 	tim_16b_tcnt_value(TIM_number, TIM_TCNT_inital_value);
-	tim_16b_prescaler(TIM_prescaler);
+	tim_16b_ocr_value(TIM_number, TIM_channel, TIM_OCR_value);
 }
 
 void tim_16b_tcnt_value(tim_16b_num_t TIM_number, uint16_t TIM_TCNT_value)
@@ -65,72 +73,79 @@ void tim_16b_ocr_value(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, 
 
 void tim_16b_compare_output_mode(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, tim_16b_com_t TIM_COM_mode)
 {
-	uint8_t com_bits = 0;
-	switch (TIM_COM_mode)
+	uint8_t com_0 = 0;
+	uint8_t com_1 = 0;
+	switch (TIM_channel)
 	{
-		case TIM_16b_COM_OCnx_DISCONNECTED:		com_bits = 0b00; break;
-		case TIM_16b_COM_TOGGLE_OCnx:			com_bits = 0b01; break;
-		case TIM_16b_COM_NON_INVERT_OCnx:		com_bits = 0b10; break;
-		case TIM_16b_COM_INVERT_OCnx:			com_bits = 0b11; break;
-		default: break;
-	}
-
-	switch (TIM_number)
-	{
-		case TIM_16b_NUM_1:
-			switch (TIM_channel)
+		case TIM_16b_CHANNEL_A:
+			switch (TIM_COM_mode)
 			{
-				case TIM_16b_CHANNEL_A:
-					TCCR1A = (TCCR1A & ~((1 << COM1A1) | (1 << COM1A0))) | (com_bits << COM1A0);
-					break;
-				case TIM_16b_CHANNEL_B:
-					TCCR1A = (TCCR1A & ~((1 << COM1B1) | (1 << COM1B0))) | (com_bits << COM1B0);
-					break;
-				case TIM_16b_CHANNEL_C:
-					TCCR1A = (TCCR1A & ~((1 << COM1C1) | (1 << COM1C0))) | (com_bits << COM1C0);
-					break;
+				case TIM_16b_COM_OCnx_DISCONNECTED:		com_1 = (0 << COM1A1); com_0 = (0 << COM1A0); break;
+				case TIM_16b_COM_TOGGLE_OCnx:			com_1 = (0 << COM1A1); com_0 = (1 << COM1A0); break;
+				case TIM_16b_COM_NON_INVERT_OCnx:		com_1 = (1 << COM1A1); com_0 = (0 << COM1A0); break;
+				case TIM_16b_COM_INVERT_OCnx:			com_1 = (1 << COM1A1); com_0 = (1 << COM1A0); break;
 				default: break;
 			}
-			break;
-		case TIM_16b_NUM_3:
-			switch (TIM_channel)
+			switch (TIM_number)
 			{
-				case TIM_16b_CHANNEL_A:
-					TCCR3A = (TCCR3A & ~((1 << COM3A1) | (1 << COM3A0))) | (com_bits << COM3A0);
-					break;
-				case TIM_16b_CHANNEL_B:
-					TCCR3A = (TCCR3A & ~((1 << COM3B1) | (1 << COM3B0))) | (com_bits << COM3B0);
-					break;
-				case TIM_16b_CHANNEL_C:
-					TCCR3A = (TCCR3A & ~((1 << COM3C1) | (1 << COM3C0))) | (com_bits << COM3C0);
-					break;
-				default: break;
+				case TIM_16b_NUM_1:						TCCR1A	|= ((com_1 << COM1A1) | (com_0 << COM1A0)); break;
+				case TIM_16b_NUM_3:						TCCR3A	|= ((com_1 << COM1A1) | (com_0 << COM1A0)); break;
 			}
 			break;
-		default: break;
+		case TIM_16b_CHANNEL_B:
+			switch (TIM_COM_mode)
+			{
+				case TIM_16b_COM_OCnx_DISCONNECTED:		com_1 = (0 << COM1B1); com_0 = (0 << COM1B0); break;
+				case TIM_16b_COM_TOGGLE_OCnx:			com_1 = (0 << COM1B1); com_0 = (1 << COM1B0); break;
+				case TIM_16b_COM_NON_INVERT_OCnx:		com_1 = (1 << COM1B1); com_0 = (0 << COM1B0); break;
+				case TIM_16b_COM_INVERT_OCnx:			com_1 = (1 << COM1B1); com_0 = (1 << COM1B0); break;
+				default: break;
+			}
+			switch (TIM_number)
+			{
+				case TIM_16b_NUM_1:						TCCR1A	|= ((com_1 << COM1B1) | (com_0 << COM1B0)); break;
+				case TIM_16b_NUM_3:						TCCR3A	|= ((com_1 << COM1B1) | (com_0 << COM1B0)); break;
+			}
+			break;
+		case TIM_16b_CHANNEL_C:
+			switch (TIM_COM_mode)
+			{
+				case TIM_16b_COM_OCnx_DISCONNECTED:		com_1 = (0 << COM1C1); com_0 = (0 << COM1C0); break;
+				case TIM_16b_COM_TOGGLE_OCnx:			com_1 = (0 << COM1C1); com_0 = (1 << COM1C0); break;
+				case TIM_16b_COM_NON_INVERT_OCnx:		com_1 = (1 << COM1C1); com_0 = (0 << COM1C0); break;
+				case TIM_16b_COM_INVERT_OCnx:			com_1 = (1 << COM1C1); com_0 = (1 << COM1C0); break;
+				default: break;
+			}
+			switch (TIM_number)
+			{
+				case TIM_16b_NUM_1:						TCCR1A	|= ((com_1 << COM1C1) | (com_0 << COM1C0)); break;
+				case TIM_16b_NUM_3:						TCCR3A	|= ((com_1 << COM1C1) | (com_0 << COM1C0)); break;
+			}
+			break;
 	}
 }
 
 void tim_16b_prescaler(tim_16b_prescaler_t TIM_prescaler)
 {
-	TCCR1B = (TCCR1B & 0xF8) | (TIM_prescaler & 0x07);
-	TCCR3B = (TCCR3B & 0xF8) | (TIM_prescaler & 0x07);
+	TCCR1B = (TCCR1B & 0xF8) | (TIM_prescaler);
 }
 
 void tim_16b_waveform_mode(tim_16b_num_t TIM_number, tim_16b_mode_t TIM_waveform_mode)
 {
-	uint8_t wgm_low = TIM_waveform_mode & 0x03;
-	uint8_t wgm_high = (TIM_waveform_mode >> 2) & 0x03;
+	uint8_t wgm_3 = TIM_waveform_mode & 0b1000;
+	uint8_t wgm_2 = TIM_waveform_mode & 0b0100;
+	uint8_t wgm_1 = TIM_waveform_mode & 0b0010;
+	uint8_t wgm_0 = TIM_waveform_mode & 0b0001;
 
 	switch (TIM_number)
 	{
 		case TIM_16b_NUM_1:
-			TCCR1A = (TCCR1A & ~((1 << WGM11) | (1 << WGM10))) | (wgm_low << WGM10);
-			TCCR1B = (TCCR1B & ~((1 << WGM13) | (1 << WGM12))) | (wgm_high << WGM12);
+			TCCR1A = (TCCR1A & ~((1 << WGM11) | (1 << WGM10))) | (wgm_1 << WGM11) | (wgm_0 << WGM10);
+			TCCR1B = (TCCR1B & ~((1 << WGM13) | (1 << WGM12))) | (wgm_3 << WGM13) | (wgm_2 << WGM12);
 			break;
 		case TIM_16b_NUM_3:
-			TCCR3A = (TCCR3A & ~((1 << WGM11) | (1 << WGM10))) | (wgm_low << WGM10);
-			TCCR3B = (TCCR3B & ~((1 << WGM13) | (1 << WGM12))) | (wgm_high << WGM12);
+			TCCR3A = (TCCR3A & ~((1 << WGM11) | (1 << WGM10))) | (wgm_1 << WGM11) | (wgm_0 << WGM10);
+			TCCR3B = (TCCR3B & ~((1 << WGM13) | (1 << WGM12))) | (wgm_3 << WGM13) | (wgm_2 << WGM12);
 			break;
 		default: break;
 	}
@@ -138,21 +153,33 @@ void tim_16b_waveform_mode(tim_16b_num_t TIM_number, tim_16b_mode_t TIM_waveform
 
 void tim_16b_top_value(tim_16b_num_t TIM_number, uint16_t TIM_TOP_value)
 {
-	uint8_t wgm_bits;
+	uint8_t wgm_bits = 0;
 	switch (TIM_number)
 	{
 		case TIM_16b_NUM_1:
-			wgm_bits = ((TCCR1B & ((1 << WGM13) | (1 << WGM12))) >> WGM12) << 2;
-			wgm_bits |= (TCCR1A & ((1 << WGM11) | (1 << WGM10))) >> WGM10;
-			if (wgm_bits == 14 || wgm_bits == 10 || wgm_bits == 12) ICR1 = TIM_TOP_value;
-			else if (wgm_bits == 15 || wgm_bits == 11 || wgm_bits == 13) OCR1A = TIM_TOP_value;
+			wgm_bits = (TCCR1B & ((1 << WGM13) | (1 << WGM12)));
+			wgm_bits |= (TCCR1A & ((1 << WGM11) | (1 << WGM10)));
+			if (wgm_bits == 0b00010000 || wgm_bits == 0b00010010 || wgm_bits == 0b00011000 || wgm_bits == 0b00011010) 
+			{
+				ICR1 = TIM_TOP_value;
+			}
+			else if (wgm_bits == 0b00001000 || wgm_bits == 0b00010001 || wgm_bits == 0b00010011 || wgm_bits == 0b00011011) 
+			{
+				OCR1A = TIM_TOP_value;
+			}
 			break;
 		case TIM_16b_NUM_3:
-			wgm_bits = ((TCCR3B & ((1 << WGM13) | (1 << WGM12))) >> WGM12) << 2;
-			wgm_bits |= (TCCR3A & ((1 << WGM11) | (1 << WGM10))) >> WGM10;
-			if (wgm_bits == 14 || wgm_bits == 10 || wgm_bits == 12) ICR3 = TIM_TOP_value;
-			else if (wgm_bits == 15 || wgm_bits == 11 || wgm_bits == 13) OCR3A = TIM_TOP_value;
-			break;
+			wgm_bits = (TCCR3B & ((1 << WGM13) | (1 << WGM12)));
+			wgm_bits |= (TCCR3A & ((1 << WGM11) | (1 << WGM10)));
+			if (wgm_bits == 0b00010000 || wgm_bits == 0b00010010 || wgm_bits == 0b00011000 || wgm_bits == 0b00011010)
+			{
+				ICR3 = TIM_TOP_value;
+			}
+			else if (wgm_bits == 0b00001000 || wgm_bits == 0b00010001 || wgm_bits == 0b00010011 || wgm_bits == 0b00011011)
+			{
+				OCR3A = TIM_TOP_value;
+			}
+		break;
 		default: break;
 	}
 }
