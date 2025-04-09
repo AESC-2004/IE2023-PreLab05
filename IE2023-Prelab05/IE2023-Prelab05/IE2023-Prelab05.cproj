@@ -139,10 +139,16 @@
     <Compile Include="32u4adc.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="m32u4tim0.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="m32u4tims16b.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="m32u4tims16b.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="m32u4tim0.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
