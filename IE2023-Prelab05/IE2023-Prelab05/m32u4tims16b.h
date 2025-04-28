@@ -130,5 +130,6 @@ void tim_16b_reset(tim_16b_num_t TIM_number);
 // This function shall look for the WGM bits to see which register to change depending on the waveform mode established!
 // If no register controls the TOP value, no action should be done!
 void	tim_16b_top_value(tim_16b_num_t TIM_number, uint16_t TIM_TOP_value);
+/*********************************************************************************************************************************************/
 
 #endif /* M32U4TIMS16B_H_ */

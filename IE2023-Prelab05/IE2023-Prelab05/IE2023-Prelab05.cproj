@@ -151,6 +151,12 @@
     <Compile Include="m32u4tim0.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="m32u4usart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="m32u4usart.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
