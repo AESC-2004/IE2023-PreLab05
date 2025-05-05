@@ -6,24 +6,27 @@
  */ 
 
 /*********************************************************************************************************************************************/
-// Libraries
+// m32u4tims16b.c - 16b Timers library for ATmega32U4
+/*********************************************************************************************************************************************/
 
+/*********************************************************************************************************************************************/
+// Libraries
 #include <avr/io.h>
 #include <stdint.h>
 #include "m32u4tims16b.h"
 /*********************************************************************************************************************************************/
 
 /*********************************************************************************************************************************************/
-//Functions
+// Timers initiation function
 
-void tim_16b_init(tim_16b_num_t TIM_number,
-tim_16b_channel_t TIM_channel,
-tim_16b_prescaler_t TIM_prescaler,
-tim_16b_mode_t TIM_waveform_mode,
-uint16_t TIM_TOP_value,
-tim_16b_com_t TIM_COM_mode,
-uint16_t TIM_TCNT_inital_value,
-tim_16b_ocnx_t TIM_OCnx_DDRn_ENABLING)
+void	tim_16b_init(tim_16b_num_t			TIM_number,
+					 tim_16b_channel_t		TIM_channel,
+					 tim_16b_prescaler_t	TIM_prescaler,
+					 tim_16b_mode_t			TIM_waveform_mode,
+					 uint16_t				TIM_TOP_value,
+					 tim_16b_com_t			TIM_COM_mode,
+					 uint16_t				TIM_TCNT_inital_value,
+					 tim_16b_ocnx_t			TIM_OCnx_DDRn_ENABLING)
 {
 	tim_16b_reset(TIM_number);
 	tim_16b_prescaler(TIM_number, TIM_prescaler);
@@ -40,8 +43,12 @@ tim_16b_ocnx_t TIM_OCnx_DDRn_ENABLING)
 	tim_16b_top_value(TIM_number, TIM_TOP_value);
 	tim_16b_tcnt_value(TIM_number, TIM_TCNT_inital_value);
 }
+/*********************************************************************************************************************************************/
 
-void tim_16b_tcnt_value(tim_16b_num_t TIM_number, uint16_t TIM_TCNT_value)
+/*********************************************************************************************************************************************/
+// Timers-Counter values functions
+
+void	tim_16b_tcnt_value(tim_16b_num_t TIM_number, uint16_t TIM_TCNT_value)
 {
 	switch (TIM_number)
 	{
@@ -51,7 +58,7 @@ void tim_16b_tcnt_value(tim_16b_num_t TIM_number, uint16_t TIM_TCNT_value)
 	}
 }
 
-void tim_16b_ocr_value(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, uint16_t TIM_OCR_value)
+void	tim_16b_ocr_value(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, uint16_t TIM_OCR_value)
 {
 	switch (TIM_number)
 	{
@@ -76,7 +83,46 @@ void tim_16b_ocr_value(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, 
 	}
 }
 
-void tim_16b_ovf_interrupt_enable(tim_16b_num_t TIM_number) {
+void	tim_16b_top_value(tim_16b_num_t TIM_number, uint16_t TIM_TOP_value)
+{
+	uint8_t WGM_bits = 0;
+	switch (TIM_number)
+	{
+		case TIM_16b_NUM_1:
+		WGM_bits = (TCCR1B & ((1 << WGM13) | (1 << WGM12)));
+		WGM_bits |= (TCCR1A & ((1 << WGM11) | (1 << WGM10)));
+		if ((WGM_bits == 0b00010000) || (WGM_bits == 0b00010010) || (WGM_bits == 0b00011000) || (WGM_bits == 0b00011010))
+		{
+			ICR1 = TIM_TOP_value;
+		}
+		else if ((WGM_bits == 0b00001000) || (WGM_bits == 0b00010001) || (WGM_bits == 0b00010011) || (WGM_bits == 0b00011011))
+		{
+			OCR1A = TIM_TOP_value;
+		}
+		break;
+		case TIM_16b_NUM_3:
+		WGM_bits = (TCCR3B & ((1 << WGM13) | (1 << WGM12)));
+		WGM_bits |= (TCCR3A & ((1 << WGM11) | (1 << WGM10)));
+		if ((WGM_bits == 0b00010000) || (WGM_bits == 0b00010010) || (WGM_bits == 0b00011000) || (WGM_bits == 0b00011010))
+		{
+			ICR3 = TIM_TOP_value;
+		}
+		else if ((WGM_bits == 0b00001000) || (WGM_bits == 0b00010001) || (WGM_bits == 0b00010011) || (WGM_bits == 0b00011011))
+		{
+			OCR3A = TIM_TOP_value;
+		}
+		break;
+		default: break;
+	}
+}
+
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// Timers interrupt enabling functions
+
+void	tim_16b_ovf_interrupt_enable(tim_16b_num_t TIM_number) 
+{
 	switch (TIM_number) {
 		case TIM_16b_NUM_1: TIMSK1 |= (1 << TOIE1); break;
 		case TIM_16b_NUM_3: TIMSK3 |= (1 << TOIE3); break;
@@ -84,7 +130,8 @@ void tim_16b_ovf_interrupt_enable(tim_16b_num_t TIM_number) {
 	}
 }
 
-void tim_16b_oc_interrupt_enable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel) {
+void	tim_16b_oc_interrupt_enable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel)
+{
 	switch (TIM_number) {
 		case TIM_16b_NUM_1:
 		switch (TIM_channel)
@@ -108,7 +155,8 @@ void tim_16b_oc_interrupt_enable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM
 	}
 }
 
-void tim_16b_ovf_interrupt_disable(tim_16b_num_t TIM_number) {
+void	tim_16b_ovf_interrupt_disable(tim_16b_num_t TIM_number) 
+{
 	switch (TIM_number) {
 		case TIM_16b_NUM_1: TIMSK1 &= ~(1 << TOIE1); break;
 		case TIM_16b_NUM_3: TIMSK3 &= ~(1 << TOIE3); break;
@@ -116,7 +164,8 @@ void tim_16b_ovf_interrupt_disable(tim_16b_num_t TIM_number) {
 	}
 }
 
-void tim_16b_oc_interrupt_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel) {
+void	tim_16b_oc_interrupt_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel) 
+{
 	switch (TIM_number) {
 		case TIM_16b_NUM_1:
 		switch (TIM_channel)
@@ -140,7 +189,12 @@ void tim_16b_oc_interrupt_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TI
 	}
 }
 
-void tim_16b_prescaler(tim_16b_num_t TIM_number, tim_16b_prescaler_t TIM_prescaler)
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// Timers prescaler function
+
+void	tim_16b_prescaler(tim_16b_num_t TIM_number, tim_16b_prescaler_t TIM_prescaler)
 {
 	switch (TIM_number)
 	{
@@ -151,7 +205,12 @@ void tim_16b_prescaler(tim_16b_num_t TIM_number, tim_16b_prescaler_t TIM_prescal
 	
 }
 
-void tim_16b_waveform_mode(tim_16b_num_t TIM_number, tim_16b_mode_t TIM_waveform_mode)
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// Timers waveform and compare output mode functions
+
+void	tim_16b_waveform_mode(tim_16b_num_t TIM_number, tim_16b_mode_t TIM_waveform_mode)
 {
 	uint8_t WGM10_bits = 0;
 	uint8_t WGM32_bits = 0;
@@ -178,22 +237,22 @@ void tim_16b_waveform_mode(tim_16b_num_t TIM_number, tim_16b_mode_t TIM_waveform
 	switch (TIM_number)
 	{
 		case TIM_16b_NUM_1:
-		TCCR1A &= ~((1 << WGM11) | (1 << WGM10));
-		TCCR1A |= (WGM10_bits);
-		TCCR1B &= ~((1 << WGM13) | (1 << WGM12));
-		TCCR1B |= (WGM32_bits);
-		break;
+			TCCR1A &= ~((1 << WGM11) | (1 << WGM10));
+			TCCR1A |= (WGM10_bits);
+			TCCR1B &= ~((1 << WGM13) | (1 << WGM12));
+			TCCR1B |= (WGM32_bits);
+			break;
 		case TIM_16b_NUM_3:
-		TCCR3A &= ~((1 << WGM11) | (1 << WGM10));
-		TCCR3A |= (WGM10_bits);
-		TCCR3B &= ~((1 << WGM13) | (1 << WGM12));
-		TCCR3B |= (WGM32_bits);
-		break;
+			TCCR3A &= ~((1 << WGM11) | (1 << WGM10));
+			TCCR3A |= (WGM10_bits);
+			TCCR3B &= ~((1 << WGM13) | (1 << WGM12));
+			TCCR3B |= (WGM32_bits);
+			break;
 		default: break;
 	}
 }
 
-void tim_16b_compare_output_mode(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, tim_16b_com_t TIM_COM_mode)
+void	tim_16b_compare_output_mode(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, tim_16b_com_t TIM_COM_mode)
 {
 	uint8_t COM_bits = 0;
 	switch (TIM_channel)
@@ -246,7 +305,12 @@ void tim_16b_compare_output_mode(tim_16b_num_t TIM_number, tim_16b_channel_t TIM
 	}
 }
 
-void tim_16b_ocnx_enable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel)
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// Timers pin enabling functions
+
+void	tim_16b_ocnx_enable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel)
 {
 	switch (TIM_number)
 	{
@@ -272,7 +336,7 @@ void tim_16b_ocnx_enable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel
 	}
 }
 
-void tim_16b_ocnx_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel)
+void	tim_16b_ocnx_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel)
 {
 	switch (TIM_number)
 	{
@@ -298,65 +362,21 @@ void tim_16b_ocnx_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channe
 	}
 }
 
-void tim_16b_reset(tim_16b_num_t TIM_number)
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// Timers resetting function
+
+void	tim_16b_reset(tim_16b_num_t TIM_number)
 {
 	switch (TIM_number)
 	{
 		case TIM_16b_NUM_1:
-		TCCR1A = 0;
-		TCCR1B = 0;
-		TCCR1C = 0;
-		TCNT1 = 0;
-		OCR1A = 0;
-		OCR1B = 0;
-		OCR1C = 0;
-		ICR1 = 0;
-		TIMSK1 = 0;
-		break;
+			TCCR1A = 0; TCCR1B = 0; TCCR1C = 0; TCNT1 = 0; OCR1A = 0; OCR1B = 0; OCR1C = 0; ICR1 = 0; TIMSK1 = 0; break;
 		case TIM_16b_NUM_3:
-		TCCR3A = 0;
-		TCCR3B = 0;
-		TCCR3C = 0;
-		TCNT3 = 0;
-		OCR3A = 0;
-		OCR3B = 0;
-		OCR3C = 0;
-		ICR3 = 0;
-		TIMSK3 = 0;
-		break;
+			TCCR3A = 0; TCCR3B = 0; TCCR3C = 0; TCNT3 = 0; OCR3A = 0; OCR3B = 0; OCR3C = 0; ICR3 = 0; TIMSK3 = 0; break;
 		default: break;
 	}
 }
 
-void tim_16b_top_value(tim_16b_num_t TIM_number, uint16_t TIM_TOP_value)
-{
-	uint8_t WGM_bits = 0;
-	switch (TIM_number)
-	{
-		case TIM_16b_NUM_1:
-		WGM_bits = (TCCR1B & ((1 << WGM13) | (1 << WGM12)));
-		WGM_bits |= (TCCR1A & ((1 << WGM11) | (1 << WGM10)));
-		if ((WGM_bits == 0b00010000) || (WGM_bits == 0b00010010) || (WGM_bits == 0b00011000) || (WGM_bits == 0b00011010))
-		{
-			ICR1 = TIM_TOP_value;
-		}
-		else if ((WGM_bits == 0b00001000) || (WGM_bits == 0b00010001) || (WGM_bits == 0b00010011) || (WGM_bits == 0b00011011))
-		{
-			OCR1A = TIM_TOP_value;
-		}
-		break;
-		case TIM_16b_NUM_3:
-		WGM_bits = (TCCR3B & ((1 << WGM13) | (1 << WGM12)));
-		WGM_bits |= (TCCR3A & ((1 << WGM11) | (1 << WGM10)));
-		if ((WGM_bits == 0b00010000) || (WGM_bits == 0b00010010) || (WGM_bits == 0b00011000) || (WGM_bits == 0b00011010))
-		{
-			ICR3 = TIM_TOP_value;
-		}
-		else if ((WGM_bits == 0b00001000) || (WGM_bits == 0b00010001) || (WGM_bits == 0b00010011) || (WGM_bits == 0b00011011))
-		{
-			OCR3A = TIM_TOP_value;
-		}
-		break;
-		default: break;
-	}
-}
+/*********************************************************************************************************************************************/

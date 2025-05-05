@@ -5,6 +5,10 @@
  *  Author: ang50
  */ 
 
+/*********************************************************************************************************************************************/
+// m32u4usart.h - USART library for ATmega32U4
+/*********************************************************************************************************************************************/
+
 
 #ifndef M32U4USART_H_
 #define M32U4USART_H_
@@ -83,51 +87,46 @@ typedef enum {
 // Function prototypes
 
 // Initializing a USART communication type
-void	usart_init(usart_mode_t USART_mode,
-usart_clock_polarity_t USART_clock_polarity,
-usart_speed_t USART_speed,
-usart_character_size_t USART_character_size,
-usart_parity_mode_t USART_parity_mode,
-usart_stop_bit_t USART_stop_bit,
-usart_mpcm_t USART_multiprocessor_mode,
-usart_hardware_flow_control_t USART_flow_control_mode,
-uint16_t USART_baud_value
-);
+void	usart_init(usart_mode_t						USART_mode,
+				   usart_clock_polarity_t			USART_clock_polarity,
+				   usart_speed_t					USART_speed,
+				   usart_character_size_t			USART_character_size,
+				   usart_parity_mode_t				USART_parity_mode,
+				   usart_stop_bit_t					USART_stop_bit,
+				   usart_mpcm_t						USART_multiprocessor_mode,
+				   usart_hardware_flow_control_t	USART_flow_control_mode,
+				   uint16_t							USART_baud_value);
 
 // Initializing a UART communication type
-void	uart_init(usart_speed_t USART_speed,
-usart_character_size_t USART_character_size,
-usart_parity_mode_t USART_parity_mode,
-usart_stop_bit_t USART_stop_bit,
-usart_mpcm_t USART_multiprocessor_mode,
-usart_hardware_flow_control_t USART_flow_control_mode,
-uint16_t USART_baud_value
-);
+void	uart_init(usart_speed_t					USART_speed,
+				  usart_character_size_t		USART_character_size,
+				  usart_parity_mode_t			USART_parity_mode,
+				  usart_stop_bit_t				USART_stop_bit,
+				  usart_mpcm_t					USART_multiprocessor_mode,
+				  usart_hardware_flow_control_t USART_flow_control_mode,
+				  uint16_t						USART_baud_value);
 
 // Initializing a USRT communication type
-void	usrt_init(usart_clock_polarity_t USART_clock_polarity,
-usart_character_size_t USART_character_size,
-usart_parity_mode_t USART_parity_mode,
-usart_stop_bit_t USART_stop_bit,
-usart_mpcm_t USART_multiprocessor_mode,
-usart_hardware_flow_control_t USART_flow_control_mode,
-uint16_t USART_baud_value
-);
+void	usrt_init(usart_clock_polarity_t		USART_clock_polarity,
+				  usart_character_size_t		USART_character_size,
+				  usart_parity_mode_t			USART_parity_mode,
+				  usart_stop_bit_t				USART_stop_bit,
+				  usart_mpcm_t					USART_multiprocessor_mode,
+				  usart_hardware_flow_control_t USART_flow_control_mode,
+				  uint16_t						USART_baud_value);
 
-// Polling Transmit				(Without changing other settings)
+// Polling Transmit					(Without changing other settings)
 // The function shall look for the number of bits being transmitted and work as needed.
 void	usart_polling_transmit(unsigned char USART_data);
-//void	usart_9b_polling_transmit(unsigned int USART_data);
 
 // Interrupt transmit			(Without changing other settings)
 void	usart_transmit_bytes(const uint8_t* USART_buffer, uint8_t USART_length);
 void	usart_transmit_string(const char* USART_string);
 uint8_t usart_load_next_byte();
 
-// Polling Receive				(Without changing other settings)
+// Polling Receive					(Without changing other settings)
 // The function shall look for the number of bits being received and work as needed.
 unsigned char	usart_polling_receive();
-//unsigned int	usart_9b_polling_receive();
 
 // Interrupt receive			(Without changing other settings)
 void	usart_receive_bytes();
@@ -136,30 +135,33 @@ uint8_t usart_get_received_byte(uint8_t USART_index);
 uint8_t usart_get_received_length();
 void	usart_rx_buffer_flush();
 
-// Receive buffer flush			(Without changing other settings)
+// Receive buffer flush				(Without changing other settings)
 void	usart_flush();
 
-// Interrupt enabling			(Without changing other settings)
+// Interrupt enabling				(Without changing other settings)
 void	usart_rx_interrupt_enable();									// Receive complete
 void	usart_tx_interrupt_enable();									// Transmit complete
 void	usart_data_register_empty_interrupt_enable();					// Data register empty
-
-// Interrupt disabling			(Without changing other settings)
 void	usart_rx_interrupt_disable();									// Receive complete
 void	usart_tx_interrupt_disable();									// Transmit complete
 void	usart_data_register_empty_interrupt_disable();					// Data register empty
 
-// Frame formats				(Without changing other settings)
+// Frame formats					(Without changing other settings)
 void	usart_frame_format(usart_character_size_t USART_character_size, usart_parity_mode_t USART_parity_mode, usart_stop_bit_t USART_stop_bit);
 void	usart_character_size(usart_character_size_t USART_character_size);
 void	usart_parity_mode(usart_parity_mode_t USART_parity_mode);
 void	usart_stop_bit(usart_stop_bit_t USART_stop_bit);
 
-// Pins enabling				(Without changing other settings)
+// Sub-protocoled communications	(Without changing other settings)
+// When both sub-protocoled communications are intended to be set, only the first shall be established
+void	usart_multiprocessor_enable();
+void	usart_multiprocessor_disable();
+void	usart_flow_control_enable();
+void	usart_flow_control_disable();
+
+// Pins enabling					(Without changing other settings)
 void	usart_rx_enable();
 void	usart_tx_enable();
-
-// Pins disabling				(Without changing other settings)
 void	usart_rx_disable();
 void	usart_tx_disable();
 

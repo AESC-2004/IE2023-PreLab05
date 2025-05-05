@@ -5,9 +5,13 @@
  *  Author: ang50
  */ 
 
+/*********************************************************************************************************************************************/
+// m32u4adc.h - ADC library for ATmega32U4
+/*********************************************************************************************************************************************/
 
-#ifndef U32U4ADC_H_
-#define U32U4ADC_H_
+
+#ifndef M32U4ADC_H_
+#define M32U4ADC_H_
 
 /*********************************************************************************************************************************************/
 // External libraries
@@ -131,46 +135,46 @@ typedef enum {
 // Function prototypes
 
 // Initializing the ADC 
-void	adc_init(adc_ref_t reference, 
-				 adc_prescaler_t prescaler,
-				 adc_adjust_t adjust,
-				 adc_channel_t channel, 
-				 adc_interrupt_enable_t adc_interrupt, 
-				 adc_auto_trigger_enable_t auto_trigger_enable, 
-				 adc_trigger_t trigger_source);
+void	adc_init(adc_ref_t					ADC_reference, 
+				 adc_prescaler_t			ADC_prescaler,
+				 adc_adjust_t				ADC_adjust,
+				 adc_channel_t				ADC_channel,
+				 adc_high_speed_enable_t	ADC_high_speed, 
+				 adc_interrupt_enable_t		ADC_interrupt_enable, 
+				 adc_auto_trigger_enable_t  ADC_auto_trigger_enable, 
+				 adc_trigger_t				ADC_trigger_source);
 
-// Enabling ADC				(Without changing other settings)
+// ADC enabling				(Without changing other settings)
 void	adc_enable();
-
-// Disabling ADC			(Without changing other settings)
 void	adc_disable();
 
 // Channel selection		(Without changing other settings)
-void	adc_channel(adc_channel_t channel);
+void	adc_channel(adc_channel_t ADC_channel);
 
 // Reference source			(Without changing other settings)
-void	adc_ref(adc_ref_t reference);
+void	adc_ref(adc_ref_t ADC_reference);
 
 // Prescaler selection		(Without changing other settings)
-void	adc_prescaler(adc_prescaler_t prescaler);
+void	adc_prescaler(adc_prescaler_t ADC_prescaler);
 
-// Auto trigger enable		(Without changing other settings)
-void	adc_enable_auto_trigger();
-
-// Auto trigger disable		(Without changing other settings)
-void	adc_disable_auto_trigger();
+// Auto trigger enabling		(Without changing other settings)
+void	adc_auto_trigger_enable();
+void	adc_auto_trigger_disable();
 
 // Auto trigger source		(Without changing other settings)
-void	adc_auto_trigger_source(adc_trigger_t trigger_source);
+void	adc_auto_trigger_source(adc_trigger_t ADC_trigger_source);
 
-// Interrupt enable			(Without changing other settings)
+// Interrupt enabling		(Without changing other settings)
 void	adc_interrupt_enable();
-
-// Interrupt disable		(Without changing other settings)
 void	adc_interrupt_disable();
 
 // Adjust mode (L or R)		(Without changing other settings)
-void	adc_adjust(adc_adjust_t adjust);
+void	adc_adjust(adc_adjust_t ADC_adjust);
+
+// High speed enabling
+void	adc_high_speed_enable();
+void	adc_high_speed_disable();
+
 /*********************************************************************************************************************************************/
 
-#endif /* U32U4ADC_H_ */
+#endif /* M32U4ADC_H_ */

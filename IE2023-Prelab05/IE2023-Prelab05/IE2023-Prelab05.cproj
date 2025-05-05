@@ -133,10 +133,10 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="32u4adc.c">
+    <Compile Include="m32u4adc.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="32u4adc.h">
+    <Compile Include="m32u4adc.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="m32u4tim0.c">

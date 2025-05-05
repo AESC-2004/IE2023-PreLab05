@@ -6,8 +6,11 @@
  */
 
 /*********************************************************************************************************************************************/
-// Libraries
+// m32u4usart.c - USART library for ATmega32U4
+/*********************************************************************************************************************************************/
 
+/*********************************************************************************************************************************************/
+// Libraries
 #include <avr/io.h>
 #include <stdint.h>
 #include "m32u4usart.h"
@@ -23,38 +26,26 @@ volatile static uint8_t USART_ready		= 1;
 volatile static uint8_t USART_rx_buffer[USART_RX_BUFFER_SIZE];
 volatile static uint8_t USART_rx_index = 0;
 volatile static uint8_t USART_rx_ready = 0;
+/*********************************************************************************************************************************************/
 
 /*********************************************************************************************************************************************/
-//Functions 
-void	usart_init(usart_mode_t USART_mode,
-usart_clock_polarity_t USART_clock_polarity,
-usart_speed_t USART_speed,
-usart_character_size_t USART_character_size,
-usart_parity_mode_t USART_parity_mode,
-usart_stop_bit_t USART_stop_bit,
-usart_mpcm_t USART_multiprocessor_mode,
-usart_hardware_flow_control_t USART_flow_control_mode,
-uint16_t USART_baud_value
-)
+// USART initiation functions 
+
+void	usart_init(usart_mode_t						USART_mode,
+				   usart_clock_polarity_t			USART_clock_polarity,
+				   usart_speed_t					USART_speed,
+				   usart_character_size_t			USART_character_size,
+				   usart_parity_mode_t				USART_parity_mode,
+				   usart_stop_bit_t					USART_stop_bit,
+				   usart_mpcm_t						USART_multiprocessor_mode,
+				   usart_hardware_flow_control_t	USART_flow_control_mode,
+				   uint16_t							USART_baud_value)
 {
 	// Initial values
-		UCSR1B	= 0;
-		UCSR1C	= 0;
-		UCSR1D	= 0;
+	UCSR1B	= 0; UCSR1C	= 0; UCSR1D	= 0;
 	// Setting the USART BAUD RATE
 	UBRR1	= USART_baud_value;
-	// Setting USCR1C
-	UCSR1C	|= (USART_mode) | (USART_parity_mode) | (USART_stop_bit);
-	// Setting the USART DATA SIZE
-	switch (USART_character_size)
-	{
-		case USART_CHARACTER_SIZE_5b: UCSR1B |= (0 << UCSZ12); UCSR1C |= (0 << UCSZ11) | (0 << UCSZ10); break;
-		case USART_CHARACTER_SIZE_6b: UCSR1B |= (0 << UCSZ12); UCSR1C |= (0 << UCSZ11) | (1 << UCSZ10); break;
-		case USART_CHARACTER_SIZE_7b: UCSR1B |= (0 << UCSZ12); UCSR1C |= (1 << UCSZ11) | (0 << UCSZ10); break;
-		case USART_CHARACTER_SIZE_8b: UCSR1B |= (0 << UCSZ12); UCSR1C |= (1 << UCSZ11) | (1 << UCSZ10); break;
-		case USART_CHARACTER_SIZE_9b: UCSR1B |= (1 << UCSZ12); UCSR1C |= (1 << UCSZ11) | (1 << UCSZ10); break;
-		default: break;
-	}
+	usart_frame_format(USART_character_size, USART_parity_mode, USART_stop_bit);
 	// USART multiprocessor and flow control mode
 	// If multiprocessor and flow control modes are both wanted to be enabled, both are being disabled because of compatibility purposes.
 	switch (USART_multiprocessor_mode)
@@ -86,39 +77,90 @@ uint16_t USART_baud_value
 		default: break;
 	}
 	
-	// Enable receiver and transmitter
+	// Enable receiver and transmitter (Purposely as the last step)
 	UCSR1B |= (1<<RXEN1)|(1<<TXEN1);
 }
 
-void	uart_init(usart_speed_t USART_speed,
-usart_character_size_t USART_character_size,
-usart_parity_mode_t USART_parity_mode,
-usart_stop_bit_t USART_stop_bit,
-usart_mpcm_t USART_multiprocessor_mode,
-usart_hardware_flow_control_t USART_flow_control_mode,
-uint16_t USART_baud_value
-)
+void	uart_init(usart_speed_t					USART_speed,
+				  usart_character_size_t		USART_character_size,
+				  usart_parity_mode_t			USART_parity_mode,
+				  usart_stop_bit_t				USART_stop_bit,
+				  usart_mpcm_t					USART_multiprocessor_mode,
+				  usart_hardware_flow_control_t USART_flow_control_mode,
+				  uint16_t						USART_baud_value)
 {
-	usart_init(USART_MODE_ASYNCHRONOUS, USART_CLOCK_POLARITY_RISING_EDGE, USART_speed, USART_character_size, USART_parity_mode, USART_stop_bit, USART_multiprocessor_mode, USART_flow_control_mode, USART_baud_value);
+	usart_init(USART_MODE_ASYNCHRONOUS,	
+			   USART_CLOCK_POLARITY_RISING_EDGE, 
+			   USART_speed, 
+			   USART_character_size, 
+			   USART_parity_mode, 
+			   USART_stop_bit, 
+			   USART_multiprocessor_mode, 
+			   USART_flow_control_mode, 
+			   USART_baud_value);
 }
 
-void	usrt_init(usart_clock_polarity_t USART_clock_polarity,
-usart_character_size_t USART_character_size,
-usart_parity_mode_t USART_parity_mode,
-usart_stop_bit_t USART_stop_bit,
-usart_mpcm_t USART_multiprocessor_mode,
-usart_hardware_flow_control_t USART_flow_control_mode,
-uint16_t USART_baud_value
-)
+void	usrt_init(usart_clock_polarity_t		USART_clock_polarity,
+				  usart_character_size_t		USART_character_size,
+				  usart_parity_mode_t			USART_parity_mode,
+				  usart_stop_bit_t				USART_stop_bit,
+				  usart_mpcm_t					USART_multiprocessor_mode,
+				  usart_hardware_flow_control_t USART_flow_control_mode,
+				  uint16_t						USART_baud_value)
 {
-	usart_init(USART_MODE_SYNCHRONOUS, USART_clock_polarity, USART_SPEED_NORMAL, USART_character_size, USART_parity_mode, USART_stop_bit, USART_multiprocessor_mode, USART_flow_control_mode, USART_baud_value);
+	usart_init(USART_MODE_SYNCHRONOUS, 
+			   USART_clock_polarity, 
+			   USART_SPEED_NORMAL, 
+			   USART_character_size, 
+			   USART_parity_mode, 
+			   USART_stop_bit, 
+			   USART_multiprocessor_mode, 
+			   USART_flow_control_mode, 
+			   USART_baud_value);
 }
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// USART sub-protocoled communication functions
+
+void	usart_multiprocessor_enable()
+{
+	// If flow control mode is enabled, no action will be done
+	// If else, the multiprocessor mode is established as needed
+	if (UCSR1D & (1 << CTSEN))
+	{} else {
+		UCSR1A	|= (1 << MPCM1);
+	}	
+}
+
+void	usart_multiprocessor_disable()
+{
+	UCSR1A	&= ~(1 << MPCM1);
+}
+
+void	usart_flow_control_enable()
+{
+	// If multiprocessor mode is enabled, no action will be done
+	// If else, the flow control mode is established as needed
+		if (UCSR1A & (1 << MPCM1))
+		{} else {
+		UCSR1D	|= (1 << CTSEN) | (1 << RTSEN);
+	}
+}
+
+void	usart_flow_control_disable()
+{
+	UCSR1D	&= ~((1 << CTSEN) | (1 << RTSEN));
+}
+
+/*********************************************************************************************************************************************/
+// USART transmit functions
 
 void	usart_polling_transmit(unsigned char USART_data)
 {
 	// Check how many bits are being sent
 	uint8_t UCSZ = 0;
-	UCSZ = UCSR1B & (1<<UCSZ12);
+	UCSZ = UCSR1B & (1 << UCSZ12);
 	if (UCSZ)		// If DATA = 9b
 	{
 		// Wait for empty transmit buffer
@@ -151,9 +193,7 @@ void	usart_transmit_bytes(const uint8_t* USART_buffer, uint8_t USART_length)
 		}
 		
 		// Declaring values for static variables
-		USART_tx_index = 0;
-		USART_tx_length = USART_length;
-		USART_ready = 0;
+		USART_tx_index = 0; USART_tx_length = USART_length; USART_ready = 0;
 	}
 }
 
@@ -188,6 +228,11 @@ uint8_t	usart_load_next_byte()
 	return 0;
 }
 
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// USART receive functions
+
 unsigned char	usart_polling_receive()
 {
 	// Check how many bits are being sent
@@ -199,9 +244,7 @@ unsigned char	usart_polling_receive()
 		// Wait for data to be received
 		while ( !(UCSR1A & (1<<RXC1)) );
 		// Get status and 9th bit, then data from buffer
-		status = UCSR1A;
-		resh = UCSR1B;
-		resl = UDR1;
+		status = UCSR1A; resh = UCSR1B; resl = UDR1;
 		// If error, return -1
 		if ( status & (1<<FE1)|(1<<DOR1)|(1<<UPE1) )
 		{
@@ -213,7 +256,7 @@ unsigned char	usart_polling_receive()
 			resh = (resh >> 1) & 0x01;
 			return (unsigned char)((resh << 8) | resl);
 		}	
-	} else
+	} else			// If DATA < 9b
 	{
 		// Wait for data to be received
 		while ( !(UCSR1A & (1<<RXC1)) );
@@ -246,7 +289,7 @@ uint8_t usart_get_received_byte(uint8_t USART_index)
 	// If the index (Or address) needed to be shown is shorter than the current receiving index:
 	// Then, no info. is returned.
 	// (I.e. if it is wanted to look for the last received byte, but a bigger index is used, 
-	//  other info. may be returned)
+	//  other info. may be returned; so, cautiously, "-1" is returned)
 	
 	if (USART_index < USART_rx_index)
 	{
@@ -261,7 +304,12 @@ uint8_t usart_get_received_length()
 	return USART_rx_index;
 }
 
-void	usart_rx_buffer_flush(void)
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// USART flushing received data functions
+
+void	usart_rx_buffer_flush()
 {
 	for (uint8_t i = 0; i < USART_RX_BUFFER_SIZE; i++)
 	{
@@ -278,6 +326,11 @@ void	usart_polling_flush()
 		dummy = UDR1;	
 	}
 }
+
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// USART interrupt enabling functions
 
 void	usart_rx_interrupt_enable()
 {
@@ -308,6 +361,10 @@ void	usart_data_register_empty_interrupt_disable()
 {
 	UCSR1B &= ~(1 << UDRIE1);
 }
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// USART frame format functions
 
 void	usart_frame_format(usart_character_size_t USART_character_size, usart_parity_mode_t USART_parity_mode, usart_stop_bit_t USART_stop_bit)
 {
@@ -351,6 +408,11 @@ void	usart_stop_bit(usart_stop_bit_t USART_stop_bit)
 	UCSR1C |= (USART_stop_bit);
 }
 
+/*********************************************************************************************************************************************/
+
+/*********************************************************************************************************************************************/
+// USART pin enabling functions
+
 void	usart_rx_enable()
 {
 	UCSR1B |= (1 << RXEN1);
@@ -370,3 +432,5 @@ void	usart_tx_disable()
 {
 	UCSR1B &= ~(1 << TXEN1);
 }
+
+/*********************************************************************************************************************************************/

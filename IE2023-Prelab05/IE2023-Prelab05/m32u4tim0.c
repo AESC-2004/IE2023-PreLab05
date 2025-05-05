@@ -6,8 +6,11 @@
  */ 
 
 /*********************************************************************************************************************************************/
-// Libraries
+// m32u4tim0.c - Timer 0 library for ATmega32U4
+/*********************************************************************************************************************************************/
 
+/*********************************************************************************************************************************************/
+// Libraries
 #include <avr/io.h>
 #include <stdint.h>
 #include "m32u4tim0.h"
@@ -16,14 +19,13 @@
 /*********************************************************************************************************************************************/
 //Functions
 
-void	tim0_init(tim0_channel_t TIM0_channel,
-tim0_prescaler_t TIM0_prescaler,
-tim0_mode_t TIM0_waveform_mode,
-uint16_t TIM0_OCRA_value,
-tim0_com_t TIM0_COM_mode,
-uint16_t TIM0_TCNT_inital_value,
-tim0_oc0x_t TIM0_OC0x_DDRn_ENABLING
-)
+void	tim0_init(tim0_channel_t	TIM0_channel,
+				  tim0_prescaler_t	TIM0_prescaler,
+				  tim0_mode_t		TIM0_waveform_mode,
+				  uint8_t			TIM0_OCRA_value,
+				  tim0_com_t		TIM0_COM_mode,
+				  uint8_t			TIM0_TCNT_inital_value,
+				  tim0_oc0x_t		TIM0_OC0x_DDRn_ENABLING)
 {
 	tim0_reset();
 	tim0_prescaler(TIM0_prescaler);
@@ -41,12 +43,12 @@ tim0_oc0x_t TIM0_OC0x_DDRn_ENABLING
 	tim0_tcnt_value(TIM0_TCNT_inital_value);
 }
 
-void tim0_tcnt_value(uint16_t TIM0_TCNT_value)
+void tim0_tcnt_value(uint8_t TIM0_TCNT_value)
 {
 	TCNT0 = TIM0_TCNT_value; 
 }
 
-void tim0_ocr_value(tim0_channel_t TIM0_channel, uint16_t TIM0_OCR_value)
+void tim0_ocr_value(tim0_channel_t TIM0_channel, uint8_t TIM0_OCR_value)
 {
 	switch (TIM0_channel)
 	{
@@ -170,10 +172,7 @@ void tim0_oc0x_disable(tim0_channel_t TIM0_channel)
 
 void tim0_reset()
 {
-	TCCR0A = 0;
-	TCCR0B = 0;
-	TCNT0 = 0;
-	OCR0A = 0;
-	OCR0B = 0;
-	TIMSK0 = 0;
+	TCCR0A = 0; TCCR0B = 0; TCNT0 = 0; OCR0A = 0; OCR0B = 0; TIMSK0 = 0;
 }
+
+/*********************************************************************************************************************************************/

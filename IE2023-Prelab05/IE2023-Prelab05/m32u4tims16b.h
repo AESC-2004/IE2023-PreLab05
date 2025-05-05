@@ -5,6 +5,10 @@
  *  Author: ang50
  */ 
 
+/*********************************************************************************************************************************************/
+// m32u4tims16b.h - 16b Timers library for ATmega32U4
+/*********************************************************************************************************************************************/
+
 
 #ifndef M32U4TIMS16B_H_
 #define M32U4TIMS16B_H_
@@ -82,21 +86,25 @@ typedef enum {
 
 // Initializing a timer
 // TOP_VALUE shall only be copied to the correct register when utile to the waveform selected.
-void	tim_16b_init(tim_16b_num_t TIM_number,
-tim_16b_channel_t TIM_channel,
-tim_16b_prescaler_t TIM_prescaler,
-tim_16b_mode_t TIM_waveform_mode,
-uint16_t TIM_TOP_value,
-tim_16b_com_t TIM_COM_mode,
-uint16_t TIM_TCNT_inital_value,
-tim_16b_ocnx_t TIM_OCnx_DDRn_ENABLING
-);
+void	tim_16b_init(tim_16b_num_t			TIM_number,
+					 tim_16b_channel_t		TIM_channel,
+					 tim_16b_prescaler_t	TIM_prescaler,
+					 tim_16b_mode_t			TIM_waveform_mode,
+					 uint16_t				TIM_TOP_value,
+					 tim_16b_com_t			TIM_COM_mode,
+					 uint16_t				TIM_TCNT_inital_value,
+					 tim_16b_ocnx_t			TIM_OCnx_DDRn_ENABLING);
 
 // TCNT Value					(Without changing other settings)
 void	tim_16b_tcnt_value(tim_16b_num_t TIM_number, uint16_t TIM_TCNT_value);
 
 // OCR	Value					(Without changing other settings)
 void	tim_16b_ocr_value(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channel, uint16_t TIM_OCR_value);
+
+// TOP Value					(Without changing other settings)
+// This function shall look for the WGM bits to see which register to change depending on the waveform mode established!
+// If no register controls the TOP value, no action should be done!
+void	tim_16b_top_value(tim_16b_num_t TIM_number, uint16_t TIM_TOP_value);
 
 // Interrupt enabling			(Without changing other settings)
 void	tim_16b_ovf_interrupt_enable(tim_16b_num_t TIM_number);									// Overflow
@@ -126,10 +134,6 @@ void	tim_16b_ocnx_disable(tim_16b_num_t TIM_number, tim_16b_channel_t TIM_channe
 // TIM reseting					(Without changing other settings)
 void tim_16b_reset(tim_16b_num_t TIM_number);
 
-// TOP Value					(Without changing other settings)
-// This function shall look for the WGM bits to see which register to change depending on the waveform mode established!
-// If no register controls the TOP value, no action should be done!
-void	tim_16b_top_value(tim_16b_num_t TIM_number, uint16_t TIM_TOP_value);
 /*********************************************************************************************************************************************/
 
 #endif /* M32U4TIMS16B_H_ */
