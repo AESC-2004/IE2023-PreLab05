@@ -135,7 +135,7 @@ void	adc_channel(adc_channel_t ADC_channel)
 	}
 	
 	ADCSRB	= (ADCSRB & ~(1 << MUX5)) | (MUX5_bit);
-	ADMUX	= (ADCSRB & 0xE0) | (MUX40_bits);
+	ADMUX	= (ADMUX & 0xE0) | (MUX40_bits);
 }
 
 void	adc_ref(adc_ref_t ADC_reference) 
